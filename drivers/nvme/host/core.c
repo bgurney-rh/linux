@@ -3776,15 +3776,29 @@ static int nvme_subsys_check_duplicate_ids(struct nvme_subsystem *subsys,
 
 	lockdep_assert_held(&subsys->lock);
 
-	list_for_each_entry(h, &subsys->nsheads, entry) {
-		if (has_uuid && uuid_equal(&ids->uuid, &h->ids.uuid))
-			return -EINVAL;
-		if (has_nguid &&
-		    memcmp(&ids->nguid, &h->ids.nguid, sizeof(ids->nguid)) == 0)
-			return -EINVAL;
-		if (has_eui64 &&
-		    memcmp(&ids->eui64, &h->ids.eui64, sizeof(ids->eui64)) == 0)
-			return -EINVAL;
+	if (has_uuid) {
+		list_for_each_entry(h, &subsys->nsheads, entry)
+			if (uuid_equal(&ids->uuid, &h->ids.uuid))
+				return -EINVAL;
+		return 0;
+	}
+
+	if (has_nguid) {
+		list_for_each_entry(h, &subsys->nsheads, entry)
+			if (memcmp(&ids->nguid,
+				   &h->ids.nguid,
+				   sizeof(ids->nguid)) == 0)
+				return -EINVAL;
+		return 0;
+	}
+
+	if (has_eui64) {
+		list_for_each_entry(h, &subsys->nsheads, entry)
+			if (memcmp(&ids->eui64,
+				   &h->ids.eui64,
+				   sizeof(ids->eui64)) == 0)
+				return -EINVAL;
+		return 0;
 	}
 
 	return 0;
