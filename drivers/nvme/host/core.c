@@ -3778,8 +3778,11 @@ static int nvme_subsys_check_duplicate_ids(struct nvme_subsystem *subsys,
 
 	if (has_uuid) {
 		list_for_each_entry(h, &subsys->nsheads, entry)
-			if (uuid_equal(&ids->uuid, &h->ids.uuid))
+			if (uuid_equal(&ids->uuid, &h->ids.uuid)) {
+				dev_warn(&subsys->dev,
+					 "firmware bug: non-unique uuid found\n");
 				return -EINVAL;
+			}
 		return 0;
 	}
 
@@ -3787,8 +3790,11 @@ static int nvme_subsys_check_duplicate_ids(struct nvme_subsystem *subsys,
 		list_for_each_entry(h, &subsys->nsheads, entry)
 			if (memcmp(&ids->nguid,
 				   &h->ids.nguid,
-				   sizeof(ids->nguid)) == 0)
+				   sizeof(ids->nguid)) == 0) {
+				dev_warn(&subsys->dev,
+					 "firmware bug: non-unique nguid found\n");
 				return -EINVAL;
+			}
 		return 0;
 	}
 
@@ -3796,8 +3802,11 @@ static int nvme_subsys_check_duplicate_ids(struct nvme_subsystem *subsys,
 		list_for_each_entry(h, &subsys->nsheads, entry)
 			if (memcmp(&ids->eui64,
 				   &h->ids.eui64,
-				   sizeof(ids->eui64)) == 0)
+				   sizeof(ids->eui64)) == 0) {
+				dev_warn(&subsys->dev,
+					 "firmware bug: non-unique eui64 found\n");
 				return -EINVAL;
+			}
 		return 0;
 	}
 
