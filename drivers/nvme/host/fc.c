@@ -3807,6 +3807,7 @@ nvme_fc_fpin_rcv(struct nvme_fc_local_port *localport,
 		dtag = be32_to_cpu(tlv->hdr.desc_tag);
 		switch (dtag) {
 		case ELS_DTAG_LNK_INTEGRITY:
+			dev_warn(lport->dev, "Link integrity event detected.\n");
 			nvme_fc_fpin_li_lport_update(lport, &tlv->li);
 			break;
 		default:
