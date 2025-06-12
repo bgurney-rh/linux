@@ -3758,8 +3758,11 @@ nvme_fc_fpin_li_lport_update(struct nvme_fc_lport *lport, struct fc_fn_li_desc *
 			struct nvme_fc_ctrl *ctrl;
 
 			spin_lock_irq(&rport->lock);
-			list_for_each_entry(ctrl, &rport->ctrl_list, ctrl_list)
+			list_for_each_entry(ctrl, &rport->ctrl_list, ctrl_list) {
+				dev_warn(ctrl->ctrl.device,
+					"setting port marginal\n");
 				set_bit(NVME_CTRL_MARGINAL, &ctrl->ctrl.flags);
+			}
 			spin_unlock_irq(&rport->lock);
 		}
 		nvme_fc_rport_put(rport);
@@ -3770,8 +3773,10 @@ nvme_fc_fpin_li_lport_update(struct nvme_fc_lport *lport, struct fc_fn_li_desc *
 		struct nvme_fc_ctrl *ctrl;
 
 		spin_lock_irq(&attached_rport->lock);
-		list_for_each_entry(ctrl, &attached_rport->ctrl_list, ctrl_list)
+		list_for_each_entry(ctrl, &attached_rport->ctrl_list, ctrl_list) {
+			dev_warn(ctrl->ctrl.device, "setting attached port marginal\n");
 			set_bit(NVME_CTRL_MARGINAL, &ctrl->ctrl.flags);
+		}
 		spin_unlock_irq(&attached_rport->lock);
 		nvme_fc_rport_put(attached_rport);
 	}
