@@ -4068,8 +4068,16 @@ out_unlock:
 static void nvme_printk_ns_ids(struct nvme_ns *ns, struct nvme_ns_info *info)
 {
 	struct nvme_ns_ids *ids = &ns->head->ids;
+	struct nvme_subsystem *subsys = ns->ctrl->subsys;
 	uuid_t *ns_uuid = &ids->uuid;
 
+	/* Use the field sizes for the non-terminated subsystem strings */
+	dev_info(ns->ctrl->device, "ns %d: model: %.40s\n",
+		ns->head->ns_id, subsys->model);
+	dev_info(ns->ctrl->device, "ns %d: serial: %.20s\n",
+		ns->head->ns_id, subsys->serial);
+	dev_info(ns->ctrl->device, "ns %d: fw rev: %.8s\n",
+		ns->head->ns_id, subsys->firmware_rev);
 	dev_info(ns->ctrl->device, "ns %d: nguid %16phN\n",
 		ns->head->ns_id, ids->nguid);
 	dev_info(ns->ctrl->device, "ns %d: eui64 %8phN\n",
