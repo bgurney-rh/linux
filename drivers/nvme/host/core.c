@@ -4065,6 +4065,19 @@ out_unlock:
 	return ret;
 }
 
+static void nvme_printk_ns_ids(struct nvme_ns *ns, struct nvme_ns_info *info)
+{
+	struct nvme_ns_ids *ids = &ns->head->ids;
+	uuid_t *ns_uuid = &ids->uuid;
+
+	dev_info(ns->ctrl->device, "ns %d: nguid %16phN\n",
+		ns->head->ns_id, ids->nguid);
+	dev_info(ns->ctrl->device, "ns %d: eui64 %8phN\n",
+		ns->head->ns_id, ids->eui64);
+	dev_info(ns->ctrl->device, "ns %d: uuid %pUb\n",
+		ns->head->ns_id, ns_uuid);
+}
+
 struct nvme_ns *nvme_find_get_ns(struct nvme_ctrl *ctrl, unsigned nsid)
 {
 	struct nvme_ns *ns, *ret = NULL;
@@ -4182,6 +4195,7 @@ static void nvme_alloc_ns(struct nvme_ctrl *ctrl, struct nvme_ns_info *info)
 		nvme_add_ns_cdev(ns);
 
 	nvme_mpath_add_disk(ns, info->anagrpid);
+	nvme_printk_ns_ids(ns, info);
 	nvme_fault_inject_init(&ns->fault_inject, ns->disk->disk_name);
 
 	/*
